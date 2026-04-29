@@ -7,4 +7,12 @@ class AppConfig {
   );
 
   static const appName = 'AlfaFut';
+
+  /// Retorna URL absoluta de um asset publico do backend (ex: brasao SVG).
+  /// Recebe path relativo como "images/brasoes/01-aguia.svg".
+  static String assetUrl(String relativePath) {
+    final base = baseUrl.replaceFirst(RegExp(r'/api/v\d+/?$'), '');
+    final pathLimpo = relativePath.startsWith('/') ? relativePath.substring(1) : relativePath;
+    return '$base/$pathLimpo';
+  }
 }

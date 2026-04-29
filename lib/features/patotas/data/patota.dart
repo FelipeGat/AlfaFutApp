@@ -9,6 +9,9 @@ class Patota {
     required this.publica,
     this.codigoConvite,
     this.totalMembros,
+    this.brasao,
+    this.responsavelId,
+    this.criadorId,
   });
 
   factory Patota.fromJson(Map<String, dynamic> j) => Patota(
@@ -21,6 +24,9 @@ class Patota {
         publica: j['publica'] as bool? ?? false,
         codigoConvite: j['codigo_convite'] as String?,
         totalMembros: j['total_membros'] as int?,
+        brasao: j['brasao'] as String?,
+        responsavelId: j['responsavel_id'] as int?,
+        criadorId: j['criador_id'] as int?,
       );
 
   final int id;
@@ -32,6 +38,9 @@ class Patota {
   final bool publica;
   final String? codigoConvite;
   final int? totalMembros;
+  final String? brasao;
+  final int? responsavelId;
+  final int? criadorId;
 
   int get vagasPorPartida => jogadoresPorTime * quantidadeTimes;
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/providers.dart';
+import '../../../shared/brasao_svg.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -39,7 +40,7 @@ class DashboardPage extends ConsumerWidget {
             padding: const EdgeInsets.all(24),
             children: [
               Text(
-                'Nao foi possivel carregar suas patotas.\n$e',
+                'Nao foi possivel carregar suas turmas.\n$e',
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ],
@@ -52,19 +53,19 @@ class DashboardPage extends ConsumerWidget {
                   const SizedBox(height: 48),
                   Icon(Icons.sports_soccer, size: 80, color: Theme.of(context).colorScheme.primary),
                   const SizedBox(height: 16),
-                  Text('Nenhuma patota ainda',
+                  Text('Nenhuma turma ainda',
                       style: Theme.of(context).textTheme.headlineMedium,
                       textAlign: TextAlign.center),
                   const SizedBox(height: 8),
                   const Text(
-                    'Crie sua primeira patota ou entre em uma usando codigo de convite.',
+                    'Crie sua primeira turma ou entre em uma usando codigo de convite.',
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
                   FilledButton.icon(
                     onPressed: () => context.push('/patotas/nova'),
                     icon: const Icon(Icons.add),
-                    label: const Text('Criar patota'),
+                    label: const Text('Criar turma'),
                   ),
                   const SizedBox(height: 8),
                   OutlinedButton.icon(
@@ -84,11 +85,13 @@ class DashboardPage extends ConsumerWidget {
                 return Card(
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
-                    leading: CircleAvatar(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                      child: const Icon(Icons.groups),
-                    ),
+                    leading: p.brasao != null
+                        ? BrasaoSvg(path: p.brasao, size: 48, semanticLabel: p.nome)
+                        : CircleAvatar(
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                            child: const Icon(Icons.groups),
+                          ),
                     title: Text(p.nome, style: Theme.of(context).textTheme.titleLarge),
                     subtitle: Text(
                       '${p.cidade ?? "Sem cidade"} • ${p.totalMembros ?? "?"} membros',
@@ -107,7 +110,7 @@ class DashboardPage extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/patotas/nova'),
         icon: const Icon(Icons.add),
-        label: const Text('Nova patota'),
+        label: const Text('Nova turma'),
       ),
     );
   }

@@ -20,6 +20,7 @@ class PatotaRepository {
     int quantidadeTimes = 2,
     double valorMensalidade = 0,
     bool publica = false,
+    String? brasao,
   }) async {
     final r = await _api.dio.post('/patotas', data: {
       'nome': nome,
@@ -30,6 +31,7 @@ class PatotaRepository {
       'quantidade_times': quantidadeTimes,
       'valor_mensalidade': valorMensalidade,
       'publica': publica,
+      if (brasao != null) 'brasao': brasao,
     });
     return Patota.fromJson(r.data as Map<String, dynamic>);
   }

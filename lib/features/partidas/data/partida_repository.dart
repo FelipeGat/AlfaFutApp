@@ -1,5 +1,6 @@
 import '../../../core/network/api_client.dart';
 import 'partida.dart';
+import 'placar.dart';
 
 class PartidaRepository {
   PartidaRepository(this._api);
@@ -32,5 +33,31 @@ class PartidaRepository {
 
   Future<void> cancelarConfirmacao(int partidaId) async {
     await _api.dio.delete('/partidas/$partidaId/confirmacao');
+  }
+
+  // ===== Placar ao vivo =====
+
+  Future<Placar> obterPlacar(int partidaId) async {
+    final r = await _api.dio.get('/partidas/$partidaId/placar');
+    return Placar.fromJson(r.data['data'] as Map<String, dynamic>);
+  }
+
+  Future<void> iniciar(int partidaId) async {
+    await _api.dio.post('/partidas/$partidaId/iniciar');
+  }
+
+  Future<void> pausar(int partidaId) async {
+    await _api.dio.post('/partidas/$partidaId/pausar');
+  }
+
+  Future<void> finalizar(int partidaId) async {
+    await _api.dio.post('/partidas/$partidaId/finalizar');
+  }
+
+  Future<void> registrarGol(int partidaId, {required int timeId, int? jogadorId}) async {
+    await _api.dio.post('/partidas/$partidaId/gol', data: {
+      'time_id': timeId,
+      if (jogadorId != null) 'jogador_id': jogadorId,
+    });
   }
 }

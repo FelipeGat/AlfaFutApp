@@ -16,10 +16,10 @@ class PatotaDetalhePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Patota'),
+        title: const Text('Turma'),
         actions: [
           IconButton(
-            tooltip: 'Despesas da patota',
+            tooltip: 'Despesas da turma',
             icon: const Icon(Icons.attach_money),
             onPressed: () => context.push('/patotas/$patotaId/despesas'),
           ),

@@ -7,7 +7,9 @@ import '../../features/auth/presentation/login_page.dart';
 import '../../features/auth/presentation/registrar_page.dart';
 import '../../features/despesas/presentation/despesa_detalhe_page.dart';
 import '../../features/despesas/presentation/despesas_page.dart';
+import '../../features/partidas/presentation/controle_partida_page.dart';
 import '../../features/partidas/presentation/partida_detalhe_page.dart';
+import '../../features/partidas/presentation/resultado_page.dart';
 import '../../features/patotas/presentation/dashboard_page.dart';
 import '../../features/patotas/presentation/nova_patota_page.dart';
 import '../../features/patotas/presentation/patota_detalhe_page.dart';
@@ -47,6 +49,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/partidas/:id',
         builder: (_, st) => PartidaDetalhePage(partidaId: int.parse(st.pathParameters['id']!)),
+      ),
+      GoRoute(
+        path: '/partidas/:id/controle',
+        builder: (_, st) => ControlePartidaPage(partidaId: int.parse(st.pathParameters['id']!)),
+      ),
+      GoRoute(
+        path: '/partidas/:id/resultado',
+        builder: (_, st) => ResultadoPage(partidaId: int.parse(st.pathParameters['id']!)),
       ),
       GoRoute(
         path: '/patotas/:id/despesas',
