@@ -119,9 +119,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           : const Text('Entrar'),
                     ),
                     const SizedBox(height: 8),
-                    TextButton(
-                      onPressed: () => context.go('/registrar'),
-                      child: const Text('Nao tenho conta - Criar agora'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () => context.go('/esqueci-senha'),
+                          child: const Text('Esqueci minha senha'),
+                        ),
+                        TextButton(
+                          onPressed: () => context.go('/registrar'),
+                          child: const Text('Criar conta'),
+                        ),
+                      ],
                     ),
                   ],
                 ),

@@ -51,6 +51,11 @@ class AuthRepository {
     }
   }
 
+  Future<String> solicitarRecuperacao(String email) async {
+    final r = await _api.dio.post('/auth/esqueci-senha', data: {'email': email});
+    return r.data['mensagem'] as String? ?? 'Link enviado para seu e-mail.';
+  }
+
   Future<void> sair() async {
     try {
       await _api.dio.post('/auth/logout');

@@ -26,6 +26,11 @@ class DespesasPage extends ConsumerWidget {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/patotas/$patotaId/despesas/nova'),
+        icon: const Icon(Icons.add),
+        label: const Text('Nova despesa'),
+      ),
       body: despesasAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Erro: $e')),

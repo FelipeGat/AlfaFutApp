@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/providers.dart';
 import '../../../shared/brasao_svg.dart';
+import '../../../shared/ui/estados.dart';
+import '../../../shared/ui/feedback.dart';
+import '../data/patota.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -15,94 +18,118 @@ class DashboardPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ola, ${usuario?.nomeExibicao ?? ""}'),
+        title: Row(
+          children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: Colors.white,
+              foregroundColor: Theme.of(context).colorScheme.primary,
+              child: const Text('A', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(width: 8),
+            const Text('AlfaFut'),
+          ],
+        ),
         actions: [
           IconButton(
-            tooltip: 'Acessibilidade',
-            icon: const Icon(Icons.accessibility_new),
-            onPressed: () => context.push('/acessibilidade'),
-          ),
-          IconButton(
-            tooltip: 'Sair da conta',
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await ref.read(authControllerProvider.notifier).sair();
-              if (context.mounted) context.go('/login');
-            },
+            tooltip: 'Perfil',
+            icon: const Icon(Icons.person),
+            onPressed: () => context.push('/perfil'),
           ),
         ],
       ),
       body: RefreshIndicator(
         onRefresh: () async => ref.invalidate(patotasProvider),
         child: patotasAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => ListView(
-            padding: const EdgeInsets.all(24),
-            children: [
-              Text(
-                'Nao foi possivel carregar suas turmas.\n$e',
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            ],
+          loading: () => const CarregandoView(),
+          error: (e, _) => ErroView(
+            mensagem: 'Nao foi possivel carregar suas turmas.',
+            onRetry: () => ref.invalidate(patotasProvider),
           ),
           data: (patotas) {
-            if (patotas.isEmpty) {
-              return ListView(
-                padding: const EdgeInsets.all(24),
-                children: [
-                  const SizedBox(height: 48),
-                  Icon(Icons.sports_soccer, size: 80, color: Theme.of(context).colorScheme.primary),
-                  const SizedBox(height: 16),
-                  Text('Nenhuma turma ainda',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                      textAlign: TextAlign.center),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Crie sua primeira turma ou entre em uma usando codigo de convite.',
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  FilledButton.icon(
-                    onPressed: () => context.push('/patotas/nova'),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Criar turma'),
-                  ),
-                  const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    onPressed: () => _entrarPorCodigo(context, ref),
-                    icon: const Icon(Icons.login),
-                    label: const Text('Entrar com codigo'),
-                  ),
-                ],
-              );
-            }
-            return ListView.separated(
+            final lista = patotas as List<Patota>;
+            return ListView(
               padding: const EdgeInsets.all(16),
-              itemCount: patotas.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (_, i) {
-                final p = patotas[i];
-                return Card(
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    leading: p.brasao != null
-                        ? BrasaoSvg(path: p.brasao, size: 48, semanticLabel: p.nome)
-                        : CircleAvatar(
-                            backgroundColor: Theme.of(context).colorScheme.primary,
-                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                            child: const Icon(Icons.groups),
-                          ),
-                    title: Text(p.nome, style: Theme.of(context).textTheme.titleLarge),
-                    subtitle: Text(
-                      '${p.cidade ?? "Sem cidade"} • ${p.totalMembros ?? "?"} membros',
-                    ),
-                    trailing: Chip(
-                      label: Text('${p.jogadoresPorTime}x${p.jogadoresPorTime}'),
-                    ),
-                    onTap: () => context.push('/patotas/${p.id}'),
+              children: [
+                // Saudacao
+                Text(
+                  'Ola, ${usuario?.nomeExibicao ?? "jogador"}!',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                const Text('Pronto para a proxima pelada?',
+                    style: TextStyle(color: Colors.black54)),
+                const SizedBox(height: 20),
+
+                // Cards de resumo
+                Row(
+                  children: [
+                    Expanded(child: _resumoCard(context, 'Turmas', '${lista.length}', Icons.groups)),
+                    const SizedBox(width: 8),
+                    Expanded(child: _resumoCard(context, 'Membros', '${lista.fold<int>(0, (s, p) => s + (p.totalMembros ?? 0))}', Icons.people)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Lista de turmas
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Row(
+                    children: [
+                      Text('Minhas turmas', style: Theme.of(context).textTheme.titleMedium),
+                      const Spacer(),
+                      TextButton.icon(
+                        onPressed: () => _entrarPorCodigo(context, ref),
+                        icon: const Icon(Icons.login, size: 18),
+                        label: const Text('Entrar com codigo'),
+                      ),
+                    ],
                   ),
-                );
-              },
+                ),
+                const SizedBox(height: 8),
+
+                if (lista.isEmpty)
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(
+                        children: [
+                          Icon(Icons.sports_soccer, size: 64, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)),
+                          const SizedBox(height: 12),
+                          const Text('Nenhuma turma ainda', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Crie sua primeira turma ou entre em uma com codigo.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.black54),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  ...lista.map((p) => Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Card(
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(12),
+                            leading: p.brasao != null
+                                ? BrasaoSvg(path: p.brasao, size: 48, semanticLabel: p.nome)
+                                : CircleAvatar(
+                                    backgroundColor: Theme.of(context).colorScheme.primary,
+                                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                                    child: const Icon(Icons.groups),
+                                  ),
+                            title: Text(p.nome, style: const TextStyle(fontWeight: FontWeight.w600)),
+                            subtitle: Text('${p.cidade ?? "Sem cidade"} • ${p.totalMembros ?? "?"} membros'),
+                            trailing: Chip(label: Text('${p.jogadoresPorTime}x${p.jogadoresPorTime}')),
+                            onTap: () => context.push('/patotas/${p.id}'),
+                          ),
+                        ),
+                      )),
+
+                const SizedBox(height: 80), // espaco pro FAB
+              ],
             );
           },
         ),
@@ -111,6 +138,23 @@ class DashboardPage extends ConsumerWidget {
         onPressed: () => context.push('/patotas/nova'),
         icon: const Icon(Icons.add),
         label: const Text('Nova turma'),
+      ),
+    );
+  }
+
+  Widget _resumoCard(BuildContext context, String label, String valor, IconData icone) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icone, color: Theme.of(context).colorScheme.primary, size: 24),
+            const SizedBox(height: 8),
+            Text(valor, style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(label, style: const TextStyle(color: Colors.black54, fontSize: 13)),
+          ],
+        ),
       ),
     );
   }
@@ -124,7 +168,7 @@ class DashboardPage extends ConsumerWidget {
         content: TextField(
           controller: ctrl,
           textCapitalization: TextCapitalization.characters,
-          decoration: const InputDecoration(labelText: 'Codigo'),
+          decoration: const InputDecoration(labelText: 'Codigo de 8 caracteres'),
           maxLength: 8,
         ),
         actions: [
@@ -136,13 +180,10 @@ class DashboardPage extends ConsumerWidget {
                 if (ctx.mounted) {
                   Navigator.of(ctx).pop();
                   ref.invalidate(patotasProvider);
+                  AppFeedback.sucesso(ctx, 'Voce entrou na turma!');
                 }
-              } catch (_) {
-                if (ctx.mounted) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    const SnackBar(content: Text('Codigo invalido.')),
-                  );
-                }
+              } catch (e) {
+                if (ctx.mounted) AppFeedback.erro(ctx, e);
               }
             },
             child: const Text('Entrar'),

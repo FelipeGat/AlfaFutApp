@@ -36,6 +36,15 @@ class PatotaRepository {
     return Patota.fromJson(r.data as Map<String, dynamic>);
   }
 
+  Future<void> sair(int patotaId) async {
+    await _api.dio.post('/patotas/$patotaId/sair');
+  }
+
+  Future<List<Map<String, dynamic>>> listarMembros(int patotaId) async {
+    final r = await _api.dio.get('/patotas/$patotaId/membros');
+    return (r.data['data'] as List).cast<Map<String, dynamic>>();
+  }
+
   Future<Patota> entrarPorCodigo(String codigo) async {
     final r = await _api.dio.post('/patotas/entrar', data: {
       'codigo_convite': codigo,

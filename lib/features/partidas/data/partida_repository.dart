@@ -60,4 +60,8 @@ class PartidaRepository {
       if (jogadorId != null) 'jogador_id': jogadorId,
     });
   }
+
+  Future<void> sortearTimes(int partidaId) async {
+    await _api.dio.post('/partidas/$partidaId/sortear');
+  }
 }

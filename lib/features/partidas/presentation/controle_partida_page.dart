@@ -62,10 +62,34 @@ class _ControlePartidaPageState extends ConsumerState<ControlePartidaPage> {
         error: (e, _) => Center(child: Padding(padding: const EdgeInsets.all(24), child: Text('Erro: $e'))),
         data: (placar) {
           if (placar.times.length < 2) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text('E preciso sortear os times antes de controlar a partida.', textAlign: TextAlign.center),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.shuffle, size: 64, color: Colors.grey),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Times ainda nao foram sorteados',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Sorteie os times antes de iniciar a partida. Eles serao balanceados por nivel e posicao.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                    const SizedBox(height: 24),
+                    FilledButton.icon(
+                      onPressed: _sortear,
+                      icon: const Icon(Icons.shuffle),
+                      label: const Text('🎲 Sortear times agora'),
+                      style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16)),
+                    ),
+                  ],
+                ),
               ),
             );
           }
@@ -292,6 +316,24 @@ class _ControlePartidaPageState extends ConsumerState<ControlePartidaPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('⚽ Gol registrado!')),
       );
+    }
+  }
+
+  Future<void> _sortear() async {
+    try {
+      await ref.read(partidaRepositoryProvider).sortearTimes(widget.partidaId);
+      ref.invalidate(placarProvider(widget.partidaId));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('🎲 Times sorteados!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
+        );
+      }
     }
   }
 

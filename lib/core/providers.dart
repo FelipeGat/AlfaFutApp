@@ -4,9 +4,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../features/auth/data/auth_repository.dart';
 import '../features/auth/data/usuario.dart';
 import '../features/despesas/data/despesa_repository.dart';
+import '../features/mensagens/data/mensagem_repository.dart';
 import '../features/partidas/data/partida_repository.dart';
 import '../features/patotas/data/patota_repository.dart';
+import '../features/perfil/data/perfil_repository.dart';
 import 'config.dart';
+import 'error/app_error.dart';
 import 'network/api_client.dart';
 import 'storage/token_storage.dart';
 
@@ -38,6 +41,19 @@ final partidaRepositoryProvider = Provider<PartidaRepository>((ref) {
 
 final despesaRepositoryProvider = Provider<DespesaRepository>((ref) {
   return DespesaRepository(ref.read(apiClientProvider));
+});
+
+final mensagemRepositoryProvider = Provider<MensagemRepository>((ref) {
+  return MensagemRepository(ref.read(apiClientProvider));
+});
+
+final perfilRepositoryProvider = Provider<PerfilRepository>((ref) {
+  return PerfilRepository(ref.read(apiClientProvider));
+});
+
+final mensagensPorPatotaProvider =
+    FutureProvider.autoDispose.family<dynamic, int>((ref, patotaId) async {
+  return ref.read(mensagemRepositoryProvider).listar(patotaId);
 });
 
 final despesasPorPatotaProvider =
@@ -79,7 +95,8 @@ class AuthController extends StateNotifier<AuthState> {
       final u = await _repo.login(email: email, senha: senha);
       state = AuthState(usuario: u);
     } catch (e) {
-      state = state.copy(carregando: false, erro: 'Email ou senha invalidos.');
+      final err = AppError.fromException(e);
+      state = state.copy(carregando: false, erro: err.mensagem);
     }
   }
 
@@ -101,7 +118,13 @@ class AuthController extends StateNotifier<AuthState> {
       );
       state = AuthState(usuario: u);
     } catch (e) {
-      state = state.copy(carregando: false, erro: 'Nao foi possivel criar a conta.');
+      final err = AppError.fromException(e);
+      // Mostra primeiro erro de campo se houver (e-mail ja existe, etc)
+      String msg = err.mensagem;
+      if (err.campos.isNotEmpty) {
+        msg = err.campos.values.first.first;
+      }
+      state = state.copy(carregando: false, erro: msg);
     }
   }
 
