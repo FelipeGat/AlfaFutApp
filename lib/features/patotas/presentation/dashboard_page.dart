@@ -6,7 +6,6 @@ import '../../../core/providers.dart';
 import '../../../shared/brasao_svg.dart';
 import '../../../shared/ui/estados.dart';
 import '../../../shared/ui/feedback.dart';
-import '../data/patota.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -31,6 +30,12 @@ class DashboardPage extends ConsumerWidget {
           ],
         ),
         actions: [
+          if (usuario?.isAdmin == true)
+            IconButton(
+              tooltip: 'Painel administrativo',
+              icon: const Icon(Icons.admin_panel_settings),
+              onPressed: () => context.push('/admin'),
+            ),
           IconButton(
             tooltip: 'Perfil',
             icon: const Icon(Icons.person),
@@ -47,7 +52,7 @@ class DashboardPage extends ConsumerWidget {
             onRetry: () => ref.invalidate(patotasProvider),
           ),
           data: (patotas) {
-            final lista = patotas as List<Patota>;
+            final lista = patotas;
             return ListView(
               padding: const EdgeInsets.all(16),
               children: [
@@ -60,6 +65,25 @@ class DashboardPage extends ConsumerWidget {
                 const Text('Pronto para a proxima pelada?',
                     style: TextStyle(color: Colors.black54)),
                 const SizedBox(height: 20),
+
+                // Banner admin (so para administradores globais)
+                if (usuario?.isAdmin == true) ...[
+                  Card(
+                    color: Colors.orange.shade50,
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.orange.shade700,
+                        foregroundColor: Colors.white,
+                        child: const Icon(Icons.shield),
+                      ),
+                      title: const Text('Painel administrativo', style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: const Text('Acesso global a todas as turmas, partidas e usuarios'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => context.push('/admin'),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
 
                 // Cards de resumo
                 Row(

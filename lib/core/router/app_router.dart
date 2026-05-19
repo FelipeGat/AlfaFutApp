@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/acessibilidade/presentation/acessibilidade_page.dart';
+import '../../features/admin/presentation/painel_admin_page.dart';
 import '../../features/auth/presentation/esqueci_senha_page.dart';
 import '../../features/auth/presentation/login_page.dart';
 import '../../features/auth/presentation/registrar_page.dart';
@@ -51,6 +52,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/dashboard', builder: (_, ___) => const DashboardPage()),
       GoRoute(path: '/perfil', builder: (_, ___) => const PerfilPage()),
       GoRoute(path: '/acessibilidade', builder: (_, ___) => const AcessibilidadePage()),
+
+      // Admin (acesso global)
+      GoRoute(path: '/admin', builder: (_, ___) => const PainelAdminPage()),
+      GoRoute(path: '/admin/patotas', builder: (_, ___) => const AdminPatotasPage()),
+      GoRoute(path: '/admin/partidas', builder: (_, ___) => const AdminPartidasPage()),
+      GoRoute(path: '/admin/usuarios', builder: (_, ___) => const AdminUsuariosPage()),
 
       // Patotas
       GoRoute(path: '/patotas/nova', builder: (_, ___) => const NovaPatotaPage()),

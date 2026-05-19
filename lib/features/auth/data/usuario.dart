@@ -8,6 +8,8 @@ class Usuario {
     this.posicaoPreferida,
     this.nivelHabilidade,
     this.preferenciasAcessibilidade,
+    this.role = 'user',
+    this.isAdmin = false,
   });
 
   factory Usuario.fromJson(Map<String, dynamic> j) => Usuario(
@@ -19,6 +21,8 @@ class Usuario {
         posicaoPreferida: j['posicao_preferida'] as String?,
         nivelHabilidade: j['nivel_habilidade'] as String?,
         preferenciasAcessibilidade: j['preferencias_acessibilidade'] as Map<String, dynamic>?,
+        role: j['role'] as String? ?? 'user',
+        isAdmin: j['is_admin'] as bool? ?? false,
       );
 
   final int id;
@@ -29,6 +33,8 @@ class Usuario {
   final String? posicaoPreferida;
   final String? nivelHabilidade;
   final Map<String, dynamic>? preferenciasAcessibilidade;
+  final String role;
+  final bool isAdmin;
 
   String get nomeExibicao => apelido ?? nome;
 

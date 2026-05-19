@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../features/admin/data/admin_repository.dart';
 import '../features/auth/data/auth_repository.dart';
 import '../features/auth/data/usuario.dart';
 import '../features/despesas/data/despesa_repository.dart';
@@ -49,6 +50,14 @@ final mensagemRepositoryProvider = Provider<MensagemRepository>((ref) {
 
 final perfilRepositoryProvider = Provider<PerfilRepository>((ref) {
   return PerfilRepository(ref.read(apiClientProvider));
+});
+
+final adminRepositoryProvider = Provider<AdminRepository>((ref) {
+  return AdminRepository(ref.read(apiClientProvider));
+});
+
+final adminResumoProvider = FutureProvider.autoDispose<ResumoAdmin>((ref) async {
+  return ref.read(adminRepositoryProvider).resumo();
 });
 
 final mensagensPorPatotaProvider =
